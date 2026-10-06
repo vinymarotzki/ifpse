@@ -1,0 +1,50 @@
+services:
+  # Produção local: imagem standalone. `docker compose --profile prod up --build -d`
+  app:
+    build: .
+    ports:
+      - "3002:3000"
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      TURSO_DATABASE_URL: file:/app/data/hse-it.db
+      HSE_WEBHOOK_SECRET: ${HSE_WEBHOOK_SECRET:-segredo-local-de-teste}
+    volumes:
+      - hse-data:/app/data
+    profiles:
+      - prod
+
+  # Hot-reload. `docker compose --profile dev up --build`
+  dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3002:3000"
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      WATCHPACK_POLLING: "true"
+      TURSO_DATABASE_URL: file:/app/data/hse-it.db
+      HSE_WEBHOOK_SECRET: ${HSE_WEBHOOK_SECRET:-segredo-local-de-teste}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      - hse-data-dev:/app/data
+    profiles:
+      - dev
+
+  # Typecheck + lint + testes unitários, dentro do container.
+  check:
+    build:
+      context: .
+      target: check
+    profiles:
+      - check
+
+volumes:
+  hse-data:
+  hse-data-dev:
