@@ -36,11 +36,11 @@ export function SectorHeatmap({ sectors }: { sectors: SectorStat[] }) {
                   <td key={f.id} className="p-0">
                     <div
                       className={`heat-cell ${cell.level ? `heat-${cell.level}` : "heat-none"}`}
-                      title={`${sector.setor} · ${f.name}: média ${fmt(cell.average, 2)}${cell.level ? ` (${RISK_LABEL[cell.level]})` : ""}`}
+                      title={`${sector.setor} · ${f.name}: índice de risco ${fmt(cell.riskIndex, 2)}${cell.level ? ` (${RISK_LABEL[cell.level]})` : ""}`}
                     >
                       <span className="flex items-center gap-1 text-[13px] font-semibold">
                         {cell.level && <RiskIcon level={cell.level} size={12} />}
-                        {fmt(cell.average)}
+                        {fmt(cell.riskIndex)}
                       </span>
                       <span className="text-[11px] text-ink-2">{cell.level ? RISK_LABEL[cell.level] : "—"}</span>
                     </div>
@@ -65,11 +65,11 @@ export function TopItems({ items }: { items: ItemStat[] }) {
 
   return (
     <ol className="space-y-3">
-      {top.map((item) => (
-        <li key={item.item}>
+      {top.map((item, index) => (
+        <li key={item.text}>
           <div className="flex items-baseline justify-between gap-3">
             <p className="min-w-0 text-[13px] leading-snug text-ink">
-              <span className="mr-1.5 font-semibold text-muted">{item.item}.</span>
+              <span className="mr-1.5 font-semibold text-muted">{index + 1}.</span>
               {item.text}
             </p>
             <span className="shrink-0 text-sm font-semibold text-ink">{fmt(item.criticalPct)}%</span>
@@ -123,7 +123,7 @@ export function ActionPlan({ factors }: { factors: FactorStat[] }) {
               <RiskBadge level={level} />
             </div>
             <p className="mt-1 text-[13px] text-ink-2">
-              Média {fmt(factor.average, 2)} · {fmt(factor.criticalPct)}% de respostas críticas
+              Índice de risco {fmt(factor.riskIndex, 2)} · {fmt(factor.criticalPct)}% de respostas críticas
             </p>
             <p className="mt-2 text-[13px] font-medium text-ink">{PLAN_TEXT[level]}</p>
             <ul className="mt-2 list-disc space-y-0.5 pl-5 text-[13px] text-ink-2">
@@ -150,20 +150,20 @@ export function Methodology() {
       <div>
         <h3 className="mb-1 font-semibold text-ink">Classificação por fator</h3>
         <p>
-          A média das respostas do fator define o nível. <strong className="text-ink">Demandas e Relacionamentos</strong>: quanto
-          maior a média, maior o risco. <strong className="text-ink">Controle, Apoio da Chefia, Apoio dos Colegas, Cargo e
-          Comunicação e Mudanças</strong>: quanto menor a média, maior o risco.
+          Cada resposta vira uma <em>nota de risco</em> de 1 a 5 (maior = pior): em afirmativas negativas (ex.: &ldquo;tenho prazos
+          impossíveis&rdquo;) vale a própria resposta; nas positivas (ex.: &ldquo;os colegas colaboram&rdquo;) a escala é invertida.
+          A média das notas do fator é o <em>índice de risco</em>.
         </p>
         <p className="mt-1">
-          O <em>índice de risco</em> (1–5) uniformiza os dois sentidos. Alto a partir de {fmt(RISK_HIGH_FROM)}, Moderado a partir de{" "}
-          {fmt(RISK_MODERATE_FROM)}, Baixo abaixo disso.
+          Alto a partir de {fmt(RISK_HIGH_FROM)}, Moderado a partir de {fmt(RISK_MODERATE_FROM)}, Baixo abaixo disso.
         </p>
       </div>
       <div>
         <h3 className="mb-1 font-semibold text-ink">Respostas críticas</h3>
         <p>
-          Nos fatores negativos contam as respostas 4 e 5; nos positivos, as respostas 1 e 2. Quanto maior a proporção, maior a
-          exposição ao risco psicossocial daquele fator. Fatores em <strong className="text-ink">Alto</strong> exigem plano de ação.
+          São as respostas com nota de risco 4 ou 5: &ldquo;Frequentemente/Sempre&rdquo; em afirmativas negativas e
+          &ldquo;Nunca/Raramente&rdquo; nas positivas. Quanto maior a proporção, maior a exposição ao risco psicossocial daquele
+          fator. Fatores em <strong className="text-ink">Alto</strong> exigem plano de ação.
         </p>
       </div>
     </div>

@@ -33,6 +33,7 @@ export function initDb(): Promise<void> {
         [
           `CREATE TABLE IF NOT EXISTS hse_responses (
              message_id INTEGER PRIMARY KEY,
+             questionnaire TEXT NOT NULL DEFAULT 'hse35',
              setor TEXT NOT NULL,
              idade INTEGER,
              respondido_em TEXT NOT NULL,
@@ -68,7 +69,15 @@ export function initDb(): Promise<void> {
         ],
         "write"
       )
-      .then(() => undefined)
+      .then(async () => {
+        // Bancos criados antes da coluna `questionnaire` (produção): sem ferramenta
+        // de migração, "duplicate column" é o sinal de que já está migrado.
+        try {
+          await getDb().execute("ALTER TABLE hse_responses ADD COLUMN questionnaire TEXT NOT NULL DEFAULT 'hse35'");
+        } catch {
+          // já migrada
+        }
+      })
       .catch((error) => {
         ready = null;
         throw error;

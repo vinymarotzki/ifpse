@@ -15,9 +15,10 @@ export async function upsertResponse(record: HseRecord): Promise<"created" | "up
 
   await db.execute({
     sql: `INSERT INTO hse_responses
-            (message_id, setor, idade, respondido_em, answers_json, answered_count, received_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (message_id, questionnaire, setor, idade, respondido_em, answers_json, answered_count, received_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT (message_id) DO UPDATE SET
+            questionnaire = excluded.questionnaire,
             setor = excluded.setor,
             idade = excluded.idade,
             respondido_em = excluded.respondido_em,
@@ -26,6 +27,7 @@ export async function upsertResponse(record: HseRecord): Promise<"created" | "up
             updated_at = excluded.updated_at`,
     args: [
       record.messageId,
+      record.questionnaire,
       record.setor,
       record.idade,
       record.respondidoEm,
@@ -60,7 +62,7 @@ export async function listResponses(filter: ResponseFilter = {}): Promise<Respon
   }
 
   const result = await getDb().execute({
-    sql: `SELECT message_id, setor, idade, respondido_em, answers_json
+    sql: `SELECT message_id, questionnaire, setor, idade, respondido_em, answers_json
           FROM hse_responses
           ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
           ORDER BY respondido_em ASC, message_id ASC`,
@@ -76,6 +78,7 @@ export async function listResponses(filter: ResponseFilter = {}): Promise<Respon
     }
     return {
       messageId: Number(row.message_id),
+      questionnaire: String(row.questionnaire ?? "hse35"),
       setor: String(row.setor),
       idade: row.idade === null ? null : Number(row.idade),
       respondidoEm: String(row.respondido_em),
