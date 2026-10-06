@@ -15,6 +15,8 @@ POST https://<host>/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>
 Também aceita o segredo no header `x-webhook-secret`. Evento esperado: `io.sasi.message` com a
 mensagem (e seus `dataFields`) em `data`. Variáveis em [.env.example](.env.example).
 
+Em produção (Vercel): `https://hse-it.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`.
+
 ## Webhook de teste (primeiro payload)
 
 Para o canal de teste da SASI, que ainda não tem formato conhecido:
