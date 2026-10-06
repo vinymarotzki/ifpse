@@ -91,6 +91,12 @@ corpo com seção `## Summary`). Nunca commitar direto em `develop`/`main`. Depo
 `develop` é promovida a `main` por um PR próprio (`--base main`), como passo deliberado à parte.
 O PR não é mergeado automaticamente.
 
+**Só o dono do repositório (Vinycios) aprova o que sobe para `main`.** Ninguém mais (nem agente de
+IA) faz merge em `main` nem push direto em `main` sem aprovação explícita dele para aquele merge;
+aprovação anterior não vale para o próximo. Cuidado: o Vercel publica `main` em produção pelo Git,
+e `vercel deploy --prod` também publica — só com ele pedindo. Abrir o PR `develop` → `main` e
+avisar que está pronto é permitido; aprovar e mergear é dele.
+
 ## Pendências conhecidas
 
 - **Sem autenticação** na dashboard (os dados são agregados/anônimos, mas é saúde ocupacional).
