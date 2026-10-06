@@ -51,6 +51,25 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
 - Cores: variáveis CSS em `globals.css` (claro/escuro pelo SO); risco = status good/warning/critical
   sempre com ícone + rótulo.
 
+## Deploy (Vercel)
+
+Projeto Vercel `hse-it` (time `vinyciosasis-projects`, hobby), conectado ao repo GitHub: push em
+`main` publica em produção; outras branches geram preview (protegido por login do Vercel — a SASI
+não alcança, use só a URL de produção). Produção: **https://hse-it.vercel.app**.
+
+- Webhook para a SASI: `https://hse-it.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`;
+  teste: `.../api/hse/webhook-test?secret=<HSE_TEST_WEBHOOK_SECRET>` (leitura em `.../captures`).
+- Banco: Turso via marketplace (`database-claret-drum`, plano Starter, iad1). O Vercel injeta
+  `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN`; sem disco persistente, o `file:` local só vale no Docker.
+  Essas duas variáveis valem também para Preview — previews usam o MESMO banco de produção.
+- Segredos `HSE_WEBHOOK_SECRET`/`HSE_TEST_WEBHOOK_SECRET` são `sensitive` (não voltam por
+  `vercel env pull`); cópia local em `.env.vercel-secrets.local` (gitignored). Trocar:
+  `vercel env rm <nome> production` + `vercel env add <nome> production --sensitive` + redeploy.
+- `.vercelignore` impede subir `.env*`, `.claude`, `.agents`. Nunca deixar um `.env.local` com as
+  credenciais do Turso de produção no repo: o `docker-compose` o lê e o Docker local passaria a
+  escrever no banco real.
+- Deploy manual: `vercel deploy --prod --yes`.
+
 ## Git workflow
 
 `main` e `develop` são as únicas branches de longa duração. Toda alteração (feature, fix, chore)
