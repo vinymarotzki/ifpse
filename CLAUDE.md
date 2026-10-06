@@ -31,6 +31,10 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
   Eventos que não são do HSE IT respondem 200 `ignored` (a SASI não deve reenviar).
   Toda chamada vai para `hse_webhook_log` com credenciais, dados do remetente e campos de
   identificação (nome…) mascarados (`src/lib/sasi/redact.ts`); guarda as últimas 500.
+- **Webhook de teste** (`src/app/api/hse/webhook-test/`): captura o payload do canal de teste
+  em `hse_test_captures` (mascarado, últimas 50) e devolve `inspectMessage` — diagnóstico do
+  mapper sem gravar resposta. Leitura em `.../captures?secret=`. Segredo `HSE_TEST_WEBHOOK_SECRET`
+  (cai em `HSE_WEBHOOK_SECRET`). Nunca alimenta a dashboard.
 - **Mapper** (`src/lib/hse/mapper.ts`): os nomes dos campos do formulário no SASI não são
   documentados, então cada afirmativa é achada pelo texto, depois por `pergunta_N`/`qN`, depois
   por "N." no título. Resposta aceita 1–5 ou rótulo ("Nunca"…"Sempre"). Não armazena o nome.

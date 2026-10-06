@@ -53,6 +53,18 @@ export function initDb(): Promise<void> {
              body_raw TEXT,
              received_at TEXT NOT NULL
            )`,
+          // Capturas do webhook de teste (descoberta do formato do canal) — nunca
+          // alimentam a dashboard.
+          `CREATE TABLE IF NOT EXISTS hse_test_captures (
+             id TEXT PRIMARY KEY,
+             method TEXT NOT NULL,
+             headers_json TEXT,
+             query_json TEXT,
+             body_json TEXT,
+             body_raw TEXT,
+             analysis_json TEXT,
+             received_at TEXT NOT NULL
+           )`,
         ],
         "write"
       )
