@@ -47,6 +47,15 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
 - Cores: variáveis CSS em `globals.css` (claro/escuro pelo SO); risco = status good/warning/critical
   sempre com ícone + rótulo.
 
+## Git workflow
+
+`main` e `develop` são as únicas branches de longa duração. Toda alteração (feature, fix, chore)
+ganha branch própria a partir de `develop`, nomeada `FIX/<o-que-faz-em-ingles>` (kebab-case,
+prefixo `FIX/` fixo para tudo), e sobe como PR **para `develop`** (`gh pr create --base develop`;
+corpo com seção `## Summary`). Nunca commitar direto em `develop`/`main`. Depois de mergeada,
+`develop` é promovida a `main` por um PR próprio (`--base main`), como passo deliberado à parte.
+O PR não é mergeado automaticamente.
+
 ## Pendências conhecidas
 
 - **Sem autenticação** na dashboard (os dados são agregados/anônimos, mas é saúde ocupacional).
