@@ -1,7 +1,6 @@
 # CLAUDE.md
 
-**IFPSE** — dashboard dos riscos psicossociais da CGC, baseada no HSE IT (Management Standards
-Indicator Tool): 7 fatores; o questionário real do canal tem 15 afirmativas (ver "Dois questionários").
+**IFPSE** — dashboard dos riscos psicossociais da CGC, baseada no Management Standards Indicator Tool: 7 fatores; o questionário real do canal tem 15 afirmativas (ver "Dois questionários").
 Nome do sistema nas plataformas: repo GitHub `vinymarotzki/ifpse`, projeto Vercel `ifpse`, banco
 Turso `ifpse`, app SASI "IFPSE" (id 2644). A pasta local ainda se chama "HSE IT" (o dono renomeia).
 Next.js 16 (App Router) + React 19 + TypeScript strict + Tailwind 3 + Recharts + libSQL.
@@ -31,7 +30,7 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
   (`src/app/api/hse/webhook/route.ts`), cadastrado no painel/API da SASI. Mesmo padrão do
   `cgc-atividades`: evento `io.sasi.message` com a mensagem em `data`; segredo
   `HSE_WEBHOOK_SECRET` no header `x-webhook-secret` ou `?secret=`; sem a env var, tudo é 401.
-  Eventos que não são do HSE IT respondem 200 `ignored` (a SASI não deve reenviar).
+  Eventos que não são do IFPSE respondem 200 `ignored` (a SASI não deve reenviar).
   Toda chamada vai para `hse_webhook_log` com credenciais, dados do remetente e campos de
   identificação (nome…) mascarados (`src/lib/sasi/redact.ts`); guarda as últimas 500.
 - **Webhook de teste** (`src/app/api/hse/webhook-test/`): captura o payload do canal de teste
@@ -45,7 +44,7 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
   `data.team.name` (hoje só existe o time de teste), data = `generatedAt` (fuso Campo Grande).
   `profile`/`profileFields` carregam dados pessoais e são mascarados no log.
 - **Dois questionários** (`questionnaire.ts`): `escola15` (o do canal: 15 afirmativas de segurança
-  escolar/CIPA Escolar) e `hse35` (HSE IT original dos PDFs). Mesmos 7 fatores. O agrupamento do
+  escolar/CIPA Escolar) e `hse35` (questionário original de 35 afirmativas dos PDFs). Mesmos 7 fatores. O agrupamento do
   `escola15` (3-2-2-2-2-2-2, na ordem) e o sentido de cada afirmativa (só a 2 e a 4 são negativas)
   foram **inferidos do conteúdo — confirmar com a CGC**.
 - **Mapper** (`src/lib/hse/mapper.ts`): acha a afirmativa pelo texto no `title`/`name`, depois

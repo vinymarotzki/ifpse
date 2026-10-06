@@ -1,7 +1,6 @@
 # IFPSE — Dashboard de Riscos Psicossociais
 
-Painel responsivo (claro/escuro) que mostra os resultados do questionário do IFPSE, baseado no **HSE IT** (Management
-Standards Indicator Tool) da CGC: perfil de risco por fator, respostas favoráveis × críticas,
+Painel responsivo (claro/escuro) que mostra os resultados do questionário do IFPSE, baseado no Management Standards Indicator Tool, da CGC: perfil de risco por fator, respostas favoráveis × críticas,
 evolução no tempo, mapa de calor setor × fator, afirmativas mais críticas e plano de ação.
 
 As respostas chegam **somente** por um webhook, conectado à API da SASI.

@@ -23,7 +23,7 @@ describe("riskScore — sentido por afirmativa", () => {
   const hse = QUESTIONNAIRES.find((q) => q.id === "hse35")!;
   const escola = QUESTIONNAIRES.find((q) => q.id === "escola15")!;
 
-  it("HSE 35: Demandas/Relacionamentos altos = pior; demais fatores, o inverso", () => {
+  it("questionário de 35: Demandas/Relacionamentos altos = pior; demais fatores, o inverso", () => {
     expect(riskScore(hse.items[1], 5)).toBe(5); // "Tenho prazos impossíveis de cumprir"
     expect(riskScore(hse.items[12], 5)).toBe(1); // "Posso decidir quando fazer uma pausa"
     expect(riskScore(hse.items[12], 1)).toBe(5);

@@ -146,7 +146,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-xl font-semibold leading-tight text-ink sm:text-2xl">Riscos Psicossociais</h1>
-            <p className="text-[13px] text-muted">IFPSE · baseado no HSE IT (Management Standards Indicator Tool) · CGC</p>
+            <p className="text-[13px] text-muted">IFPSE · baseado no Management Standards Indicator Tool · CGC</p>
           </div>
         </div>
         <div className="flex items-center gap-3 text-[13px] text-muted">
@@ -232,7 +232,7 @@ export default function Dashboard() {
               label="Respondentes"
               hint={
                 analysis.totals.forms.length > 1
-                  ? analysis.totals.forms.map((f) => `${fmtInt(f.respondents)} ${f.id === "escola15" ? "escolar" : "HSE 35"}`).join(" · ")
+                  ? analysis.totals.forms.map((f) => `${fmtInt(f.respondents)} ${f.id === "escola15" ? "escolar" : "completo (35)"}`).join(" · ")
                   : `${fmtDate(analysis.totals.firstDate)} a ${fmtDate(analysis.totals.lastDate)}`
               }
             >

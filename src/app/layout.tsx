@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "IFPSE · Riscos Psicossociais",
   description:
-    "Dashboard dos riscos psicossociais da CGC — IFPSE, baseado no Management Standards Indicator Tool (HSE IT).",
+    "Dashboard dos riscos psicossociais da CGC — IFPSE, baseado no Management Standards Indicator Tool.",
 };
 
 export const viewport: Viewport = {

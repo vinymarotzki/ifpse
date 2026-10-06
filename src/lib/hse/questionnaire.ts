@@ -1,9 +1,9 @@
 /**
- * Questionários suportados e os 7 fatores psicossociais do HSE IT (metodologia
+ * Questionários suportados e os 7 fatores psicossociais do IFPSE (metodologia
  * CGC, escala 1–5).
  *
  * Dois formulários chegam/podem chegar pelo webhook:
- *  - "hse35": o HSE IT original (35 afirmativas) dos PDFs da CGC;
+ *  - "hse35": o questionário original (35 afirmativas) dos PDFs da CGC;
  *  - "escola15": a versão de segurança escolar/CIPA Escolar (15 afirmativas)
  *    publicada no canal 38274 da SASI — mesmos 7 fatores, na mesma ordem.
  *
@@ -168,10 +168,10 @@ function build(id: QuestionnaireId, name: string, texts: readonly string[], layo
   return { id, name, items };
 }
 
-/** HSE IT original: Demandas e Relacionamentos são negativos; os demais, de proteção. */
+/** questionário original de 35 afirmativas: Demandas e Relacionamentos são negativos; os demais, de proteção. */
 const HSE35 = build(
   "hse35",
-  "HSE IT (35 afirmativas)",
+  "Questionário completo (35 afirmativas)",
   [
     "As exigências de trabalho feitas por colegas e supervisores são difíceis de combinar.",
     "Tenho prazos impossíveis de cumprir.",
@@ -271,7 +271,7 @@ export const QUESTIONNAIRES: readonly Questionnaire[] = [ESCOLA15, HSE35];
 
 const BY_ID = new Map<string, Questionnaire>(QUESTIONNAIRES.map((q) => [q.id, q]));
 
-/** Questionário desconhecido (linha antiga/corrompida) cai no HSE IT original. */
+/** Questionário desconhecido (linha antiga/corrompida) cai no questionário original de 35 afirmativas. */
 export function getQuestionnaire(id: string | null | undefined): Questionnaire {
   return (id && BY_ID.get(id)) || HSE35;
 }

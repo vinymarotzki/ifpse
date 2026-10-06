@@ -34,7 +34,7 @@ export function redactSecretInText(text: string): string {
 const SENSITIVE_HEADERS = new Set(["x-webhook-secret", "cookie"]);
 
 /**
- * Campos de formulário (`dataFields[]`) que identificam a pessoa — o HSE IT pede
+ * Campos de formulário (`dataFields[]`) que identificam a pessoa — o formulário pede
  * "Nome", e o log não deve guardar quem respondeu o que.
  */
 const PII_FIELD_NAMES = new Set(["nome", "name", "analista", "cpf", "email", "e mail", "telefone", "celular", "matricula"]);

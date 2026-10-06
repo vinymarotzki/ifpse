@@ -10,7 +10,7 @@
  * Cada afirmativa é localizada por uma cascata tolerante:
  *   1. o texto da afirmativa aparece no `title`/`name` do campo (mais confiável);
  *   2. o `name` (slug truncado) é o começo do texto de uma afirmativa;
- *   3. só para o HSE de 35: `name` do tipo "pergunta_12" ou título "12. …".
+ *   3. só para o questionário de 35: `name` do tipo "pergunta_12" ou título "12. …".
  * O questionário da mensagem é o que mais afirmativas reconhecer.
  *
  * Regra herdada do cgc-atividades: nunca lança por dado ausente ou inesperado —
@@ -143,7 +143,7 @@ export function fieldToItem(field: SasiDataField): ItemRef | null {
     }
   }
 
-  // 3. Ordem ("pergunta_12", "12. …") — só faz sentido no HSE de 35.
+  // 3. Ordem ("pergunta_12", "12. …") — só faz sentido no questionário de 35.
   if (typeof field.name === "string") {
     const match = ORDINAL_NAME.exec(normalize(field.name));
     if (match && Number(match[1]) >= 1 && Number(match[1]) <= HSE35_COUNT) {
@@ -171,7 +171,7 @@ function fieldText(field: SasiDataField): string {
 
 /**
  * Campo de metadado pelo nome/título exato (após normalizar) — igualdade, não
- * "contém", porque a afirmativa 31 do HSE de 35 também fala em "meu setor".
+ * "contém", porque a afirmativa 31 do questionário de 35 também fala em "meu setor".
  */
 function findMeta(fields: SasiDataField[], names: readonly string[]): SasiDataField | null {
   for (const field of fields) {
