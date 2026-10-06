@@ -69,8 +69,7 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
 
 Projeto Vercel `ifpse` (time `vinyciosasis-projects`, hobby), conectado ao repo GitHub: push em
 `main` publica em produção; outras branches geram preview (protegido por login do Vercel — a SASI
-não alcança, use só a URL de produção). Produção: **https://ifpse.vercel.app** (domínio do projeto, público; o `hse-it.vercel.app` antigo
-segue ativo só como transição — remover quando a SASI apontar para o novo).
+não alcança, use só a URL de produção). Produção: **https://ifpse.vercel.app** (domínio do projeto, público; o antigo `hse-it.vercel.app` foi removido do projeto em 2026-10-06; a SASI já aponta para o novo).
 
 - Webhook para a SASI: `https://ifpse.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`;
   teste: `.../api/hse/webhook-test?secret=<HSE_TEST_WEBHOOK_SECRET>` (leitura em `.../captures`).
