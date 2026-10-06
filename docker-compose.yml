@@ -1,6 +1,7 @@
 services:
   # Produção local: imagem standalone. `docker compose --profile prod up --build -d`
   app:
+    image: ifpse-app
     build: .
     ports:
       - "3002:3000"
@@ -8,7 +9,7 @@ services:
       - path: .env.local
         required: false
     environment:
-      TURSO_DATABASE_URL: file:/app/data/hse-it.db
+      TURSO_DATABASE_URL: file:/app/data/ifpse.db
       HSE_WEBHOOK_SECRET: ${HSE_WEBHOOK_SECRET:-segredo-local-de-teste}
     volumes:
       - hse-data:/app/data
@@ -17,6 +18,7 @@ services:
 
   # Hot-reload. `docker compose --profile dev up --build`
   dev:
+    image: ifpse-dev
     build:
       context: .
       target: dev
@@ -27,7 +29,7 @@ services:
         required: false
     environment:
       WATCHPACK_POLLING: "true"
-      TURSO_DATABASE_URL: file:/app/data/hse-it.db
+      TURSO_DATABASE_URL: file:/app/data/ifpse.db
       HSE_WEBHOOK_SECRET: ${HSE_WEBHOOK_SECRET:-segredo-local-de-teste}
     volumes:
       - .:/app
@@ -39,6 +41,7 @@ services:
 
   # Typecheck + lint + testes unitários, dentro do container.
   check:
+    image: ifpse-check
     build:
       context: .
       target: check

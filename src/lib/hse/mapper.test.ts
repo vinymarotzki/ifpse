@@ -65,7 +65,7 @@ describe("fieldToItem", () => {
     expect(fieldToItem({ name: slug })).toEqual({ questionnaire: "escola15", number: 3 });
   });
 
-  it("cai para a ordem só no HSE de 35", () => {
+  it("cai para a ordem só no questionário de 35", () => {
     expect(fieldToItem({ name: "pergunta_7" })).toEqual({ questionnaire: "hse35", number: 7 });
     expect(fieldToItem({ name: "Q07" })).toEqual({ questionnaire: "hse35", number: 7 });
     expect(fieldToItem({ title: "35) Qualquer texto" })).toEqual({ questionnaire: "hse35", number: 35 });
@@ -120,7 +120,7 @@ describe("mapMessageToHseRecord — formulário escolar (formato real)", () => {
   });
 });
 
-describe("mapMessageToHseRecord — HSE 35 e casos gerais", () => {
+describe("mapMessageToHseRecord — questionário de 35 e casos gerais", () => {
   const meta: SasiDataField[] = [
     { name: "setor", title: "Setor", value: "CGC" },
     { name: "idade", title: "Idade", value: "34" },

@@ -1,5 +1,5 @@
 /**
- * Webhook ÚNICO do HSE IT: recebe as respostas do questionário vindas da API
+ * Webhook ÚNICO do IFPSE: recebe as respostas do questionário vindas da API
  * SASI. Cadastrado manualmente no painel do SASI apontando para esta rota —
  * mesmo padrão do webhook do cgc-atividades (evento "io.sasi.message" com a
  * mensagem inteira em `data`).
@@ -133,7 +133,7 @@ async function handle(req: NextRequest) {
   console.log(`[hse-webhook] ${req.method} -> ${JSON.stringify(outcome)}`);
   await logCall(req, true, bodyRaw || null, outcome);
 
-  // 200 também para "ignored": o SASI não deve reenviar eventos que não são do HSE IT.
+  // 200 também para "ignored": o SASI não deve reenviar eventos que não são do IFPSE.
   return NextResponse.json({ received: true, ...outcome });
 }
 
