@@ -91,8 +91,7 @@ export function FactorBars({ factors }: { factors: FactorStat[] }) {
                 const f = payload[0].payload as (typeof data)[number];
                 return (
                   <TooltipBox title={f.name}>
-                    <p>Média das respostas: {fmt(f.average, 2)}</p>
-                    <p>Índice de risco: {fmt(f.riskIndex, 2)}</p>
+                    <p>Índice de risco: {fmt(f.riskIndex, 2)} / 5</p>
                     <p>Respostas críticas: {fmt(f.criticalPct)}%</p>
                     <div className="pt-1">
                       <RiskBadge level={f.level} />
@@ -123,9 +122,10 @@ export function ResponseMix({ factors }: { factors: FactorStat[] }) {
   const data = factors
     .filter((f) => f.answerCount > 0)
     .map((f) => {
+      // `distribution` já é por nota de RISCO (índice 0 = melhor cenário).
       const d = f.distribution;
-      const critical = f.polarity === "negative" ? d[3] + d[4] : d[0] + d[1];
-      const favorable = f.polarity === "negative" ? d[0] + d[1] : d[3] + d[4];
+      const critical = d[3] + d[4];
+      const favorable = d[0] + d[1];
       const pct = (n: number) => (n / f.answerCount) * 100;
       return {
         name: f.name,

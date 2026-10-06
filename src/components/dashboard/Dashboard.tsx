@@ -128,6 +128,8 @@ export default function Dashboard() {
     [analysis]
   );
   const ageBars = useMemo(() => (analysis?.ages ?? []).map((a) => ({ name: a.range, value: a.count })), [analysis]);
+  // O formulário escolar não pergunta a idade: sem nenhuma idade conhecida, o card some.
+  const hasAges = ageBars.some((bar) => bar.name !== "Não informada" && bar.value > 0);
 
   function applyPreset(next: Preset) {
     setPreset(next);
@@ -228,7 +230,11 @@ export default function Dashboard() {
             <Kpi
               icon={<Users size={20} aria-hidden />}
               label="Respondentes"
-              hint={`${fmtDate(analysis.totals.firstDate)} a ${fmtDate(analysis.totals.lastDate)}`}
+              hint={
+                analysis.totals.forms.length > 1
+                  ? analysis.totals.forms.map((f) => `${fmtInt(f.respondents)} ${f.id === "escola15" ? "escolar" : "HSE 35"}`).join(" · ")
+                  : `${fmtDate(analysis.totals.firstDate)} a ${fmtDate(analysis.totals.lastDate)}`
+              }
             >
               {fmtInt(analysis.totals.respondents)}
             </Kpi>
@@ -274,8 +280,8 @@ export default function Dashboard() {
                   <RiskBadge level={factor.level} />
                 </div>
                 <p className="mt-2 text-3xl font-semibold text-ink">
-                  {fmt(factor.average, 2)}
-                  <span className="ml-1 text-sm font-normal text-muted">média</span>
+                  {fmt(factor.riskIndex, 2)}
+                  <span className="ml-1 text-sm font-normal text-muted">índice de risco</span>
                 </p>
                 <p className="mt-1 text-[13px] text-ink-2">
                   {fmt(factor.criticalPct)}% de respostas críticas ({fmtInt(factor.criticalCount)} de {fmtInt(factor.answerCount)})
@@ -286,7 +292,7 @@ export default function Dashboard() {
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            <Card title="Respostas favoráveis × críticas" subtitle="Proporção de respostas por fator (críticas: 4–5 em Demandas e Relacionamentos; 1–2 nos demais)">
+            <Card title="Respostas favoráveis × críticas" subtitle="Proporção de respostas por fator (críticas = nota de risco 4–5, considerando o sentido de cada afirmativa)">
               <ResponseMix factors={analysis.factors} />
             </Card>
             <Card title="Evolução no tempo" subtitle="Índice de risco por fator">
@@ -299,16 +305,18 @@ export default function Dashboard() {
           </Card>
 
           <div className="grid gap-5 lg:grid-cols-3">
-            <Card className="lg:col-span-2" title="Afirmativas mais críticas" subtitle="Maior proporção de respostas críticas, entre as 35 do questionário">
+            <Card className="lg:col-span-2" title="Afirmativas mais críticas" subtitle="Maior proporção de respostas críticas entre as afirmativas do questionário">
               <TopItems items={analysis.items} />
             </Card>
             <div className="grid gap-5">
               <Card title="Respondentes por setor">
                 <SimpleBars data={sectorBars} label="Respondentes por setor" />
               </Card>
-              <Card title="Faixa etária">
-                <SimpleBars data={ageBars} color="var(--s3)" label="Respondentes por faixa etária" />
-              </Card>
+              {hasAges && (
+                <Card title="Faixa etária">
+                  <SimpleBars data={ageBars} color="var(--s3)" label="Respondentes por faixa etária" />
+                </Card>
+              )}
             </div>
           </div>
 
