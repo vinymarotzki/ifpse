@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HSE IT · Riscos Psicossociais",
+  title: "IFPSE · Riscos Psicossociais",
   description:
-    "Dashboard dos riscos psicossociais da CGC — Management Standards Indicator Tool (HSE IT).",
+    "Dashboard dos riscos psicossociais da CGC — IFPSE, baseado no Management Standards Indicator Tool (HSE IT).",
 };
 
 export const viewport: Viewport = {

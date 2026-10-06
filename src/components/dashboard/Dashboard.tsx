@@ -146,7 +146,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-xl font-semibold leading-tight text-ink sm:text-2xl">Riscos Psicossociais</h1>
-            <p className="text-[13px] text-muted">HSE IT · Management Standards Indicator Tool · CGC</p>
+            <p className="text-[13px] text-muted">IFPSE · baseado no HSE IT (Management Standards Indicator Tool) · CGC</p>
           </div>
         </div>
         <div className="flex items-center gap-3 text-[13px] text-muted">

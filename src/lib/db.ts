@@ -1,6 +1,6 @@
 /**
  * Cliente libSQL (singleton lazy) + DDL. Sem TURSO_DATABASE_URL usa um arquivo
- * local (`file:./data/hse-it.db`) — é o que roda no Docker com volume; em
+ * local (`file:./data/ifpse.db`) — é o que roda no Docker com volume; em
  * produção aponta para o Turso, mesmo código.
  */
 
@@ -11,7 +11,7 @@ import { createClient, type Client } from "@libsql/client";
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
-const DEFAULT_URL = "file:./data/hse-it.db";
+const DEFAULT_URL = "file:./data/ifpse.db";
 
 export function getDb(): Client {
   if (!client) {

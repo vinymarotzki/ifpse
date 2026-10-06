@@ -1,6 +1,9 @@
 # CLAUDE.md
 
-Dashboard dos riscos psicossociais da CGC (questionário **HSE IT**, 35 afirmativas, 7 fatores).
+**IFPSE** — dashboard dos riscos psicossociais da CGC, baseada no HSE IT (Management Standards
+Indicator Tool): 7 fatores; o questionário real do canal tem 15 afirmativas (ver "Dois questionários").
+Nome do sistema nas plataformas: repo GitHub `vinymarotzki/ifpse`, projeto Vercel `ifpse`, banco
+Turso `ifpse`, app SASI "IFPSE" (id 2644). A pasta local ainda se chama "HSE IT" (o dono renomeia).
 Next.js 16 (App Router) + React 19 + TypeScript strict + Tailwind 3 + Recharts + libSQL.
 UI e comentários em pt-BR; comentários explicam o *porquê*.
 
@@ -14,12 +17,12 @@ Nesta máquina o App Control bloqueia binários nativos no host (git no Bash, `e
 docker compose --profile check run --rm check          # typecheck + lint + vitest
 docker compose --profile prod up --build -d             # app em http://localhost:3002
 docker compose --profile dev up --build                 # hot-reload
-docker run --rm hseit-check npx tsx scripts/simulate-webhook.ts \
+docker run --rm ifpse-check npx tsx scripts/simulate-webhook.ts \
   --url http://host.docker.internal:3002 --secret segredo-local-de-teste --count 150
 docker compose --profile prod down -v                   # derruba e apaga o banco de teste
 ```
 
-(`hseit-check` é a imagem do target `check`; rebuild com `docker compose --profile check build check`.)
+(`ifpse-check` é a imagem do target `check`; rebuild com `docker compose --profile check build check`.)
 Para regenerar o lockfile sem executar binários: `npm install --package-lock-only --ignore-scripts`.
 
 ## Arquitetura
@@ -50,7 +53,7 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
   o que mais casar. Resposta aceita 1–5, rótulo, ou `"2_raramente"`. Não armazena o nome. Se o
   formato mudar, o payload cru está em `hse_webhook_log`/`hse_test_captures`.
 - **Armazenamento** (`src/lib/db.ts`, `store.ts`): libSQL; sem `TURSO_DATABASE_URL` usa
-  `file:./data/hse-it.db` (volume no Docker). Upsert por `message_id`. Respostas em `answers_json`.
+  `file:./data/ifpse.db` (volume no Docker). Upsert por `message_id`. Respostas em `answers_json`.
 - **Regras de risco** (`questionnaire.ts`, `risk.ts`): o sentido é da AFIRMATIVA (`highIsBad`),
   não do fator. Toda resposta vira **nota de risco** (1–5, maior = pior: `highIsBad ? nota : 6 − nota`);
   a média das notas do fator é o **índice de risco** → Alto/Moderado/Baixo; resposta crítica =
@@ -65,13 +68,14 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
 
 ## Deploy (Vercel)
 
-Projeto Vercel `hse-it` (time `vinyciosasis-projects`, hobby), conectado ao repo GitHub: push em
+Projeto Vercel `ifpse` (time `vinyciosasis-projects`, hobby), conectado ao repo GitHub: push em
 `main` publica em produção; outras branches geram preview (protegido por login do Vercel — a SASI
-não alcança, use só a URL de produção). Produção: **https://hse-it.vercel.app**.
+não alcança, use só a URL de produção). Produção: **https://ifpse.vercel.app** (domínio do projeto, público; o `hse-it.vercel.app` antigo
+segue ativo só como transição — remover quando a SASI apontar para o novo).
 
-- Webhook para a SASI: `https://hse-it.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`;
+- Webhook para a SASI: `https://ifpse.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`;
   teste: `.../api/hse/webhook-test?secret=<HSE_TEST_WEBHOOK_SECRET>` (leitura em `.../captures`).
-- Banco: Turso via marketplace (`database-claret-drum`, plano Starter, iad1). O Vercel injeta
+- Banco: Turso via marketplace (`ifpse`, plano Starter, iad1). O Vercel injeta
   `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN`; sem disco persistente, o `file:` local só vale no Docker.
   Essas duas variáveis valem também para Preview — previews usam o MESMO banco de produção.
 - Segredos `HSE_WEBHOOK_SECRET`/`HSE_TEST_WEBHOOK_SECRET` são `sensitive` (não voltam por
