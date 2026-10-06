@@ -16,31 +16,22 @@
  * descobre/depura o que realmente chega.
  */
 
-import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
 import { mapMessageToHseRecord } from "@/lib/hse/mapper";
 import { upsertResponse } from "@/lib/hse/store";
+import { parseMessage } from "@/lib/sasi/event";
 import { isInfraHeader, redactSecretInText, redactSensitive } from "@/lib/sasi/redact";
 import type { SasiMessageRaw } from "@/lib/sasi/types";
+import { isSecretValid } from "@/lib/sasi/webhook-auth";
 
 export const dynamic = "force-dynamic";
 
 /** Quantas chamadas cruas manter no log (as mais antigas são podadas). */
 const LOG_RETENTION = 500;
 
-function safeEqual(a: string, b: string): boolean {
-  const left = Buffer.from(a);
-  const right = Buffer.from(b);
-  return left.length === right.length && timingSafeEqual(left, right);
-}
-
 function isAuthorized(req: NextRequest): boolean {
-  const secret = process.env.HSE_WEBHOOK_SECRET?.trim();
-  if (!secret) return false;
-
-  const provided = [req.headers.get("x-webhook-secret"), req.nextUrl.searchParams.get("secret")];
-  return provided.some((value) => value !== null && safeEqual(value.trim(), secret));
+  return isSecretValid(req, process.env.HSE_WEBHOOK_SECRET);
 }
 
 type Outcome =
@@ -48,30 +39,6 @@ type Outcome =
   | { status: "handshake" }
   | { status: "ignored"; reason: string }
   | { status: "created" | "updated"; messageId: number; answered: number };
-
-/**
- * Extrai a mensagem do corpo: envelope `{ type: "io.sasi.message", data }` (como
- * o SASI manda) ou — por tolerância — a própria mensagem solta com `dataFields`.
- */
-function parseMessage(bodyRaw: string): { message: SasiMessageRaw } | { reason: string } {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(bodyRaw);
-  } catch {
-    return { reason: "corpo não é JSON" };
-  }
-  if (!parsed || typeof parsed !== "object") return { reason: "corpo JSON inesperado" };
-
-  const event = parsed as { type?: unknown; data?: unknown; dataFields?: unknown };
-  if (event.data && typeof event.data === "object") {
-    if (event.type !== undefined && event.type !== "io.sasi.message") {
-      return { reason: `evento ${String(event.type)} não é de mensagem` };
-    }
-    return { message: event.data as SasiMessageRaw };
-  }
-  if (Array.isArray(event.dataFields)) return { message: parsed as SasiMessageRaw };
-  return { reason: "evento sem `data` (mensagem)" };
-}
 
 function channelAllowed(message: SasiMessageRaw): boolean {
   const wanted = process.env.HSE_CHANNEL_ID?.trim();

@@ -189,6 +189,56 @@ function resolveDate(fields: SasiDataField[], message: SasiMessageRaw): string {
   return localDate(new Date());
 }
 
+export interface MessageInspection {
+  channelId: string | null;
+  dataFieldCount: number;
+  itemsRecognized: number;
+  /** Afirmativas (1–35) sem campo correspondente ou com resposta ilegível. */
+  missingItems: number[];
+  /** Campos que não viraram afirmativa nem cabeçalho conhecido — pista do formato real. */
+  unrecognizedFields: { name?: string; title?: string; type?: string; valueKind: string }[];
+  /** Resultado do mapeamento real, sem as respostas. */
+  mapping: { ok: true; setor: string; idade: number | null; respondidoEm: string } | { ok: false; reason: string };
+}
+
+/**
+ * Diagnóstico do mapper para o webhook de teste: mostra o que seria reconhecido
+ * numa mensagem sem gravar nada. Serve para ajustar o mapeamento ao primeiro
+ * payload real do canal.
+ */
+export function inspectMessage(message: SasiMessageRaw): MessageInspection {
+  const fields = Array.isArray(message.dataFields) ? message.dataFields : [];
+  const seen = new Set<number>();
+  const unrecognized: MessageInspection["unrecognizedFields"] = [];
+
+  for (const field of fields) {
+    const item = fieldToItem(field);
+    if (item !== null) {
+      if (fieldToScore(field)) seen.add(item);
+      continue;
+    }
+    unrecognized.push({
+      name: field.name,
+      title: typeof field.title === "string" ? field.title.slice(0, 120) : undefined,
+      type: field.type,
+      // Só o tipo: o valor pode ser dado pessoal (nome) e esta análise é gravada.
+      valueKind: Array.isArray(field.value) ? "array" : field.value === null ? "null" : typeof field.value,
+    });
+  }
+
+  const result = mapMessageToHseRecord(message);
+  return {
+    channelId: message.channel?.id === undefined ? null : String(message.channel.id),
+    dataFieldCount: fields.length,
+    itemsRecognized: seen.size,
+    missingItems: Array.from({ length: ITEM_COUNT }, (_, i) => i + 1).filter((item) => !seen.has(item)),
+    unrecognizedFields: unrecognized,
+    mapping: result.ok
+      ? { ok: true, setor: result.record.setor, idade: result.record.idade, respondidoEm: result.record.respondidoEm }
+      : { ok: false, reason: result.reason },
+  };
+}
+
 export function mapMessageToHseRecord(message: SasiMessageRaw): MapResult {
   if (typeof message.id !== "number") return { ok: false, reason: "mensagem sem id" };
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ITEM_COUNT, ITEM_TEXTS, SCALE } from "./questionnaire";
-import { fieldToItem, fieldToScore, mapMessageToHseRecord, parseDateText } from "./mapper";
+import { fieldToItem, fieldToScore, inspectMessage, mapMessageToHseRecord, parseDateText } from "./mapper";
 import type { SasiDataField, SasiMessageRaw } from "@/lib/sasi/types";
 
 function fullForm(build: (item: number) => SasiDataField): SasiDataField[] {
@@ -110,6 +110,33 @@ describe("mapMessageToHseRecord", () => {
   it("recusa mensagem sem id e nunca lança com dataFields ausente", () => {
     expect(mapMessageToHseRecord({}).ok).toBe(false);
     expect(mapMessageToHseRecord({ id: 5 }).ok).toBe(false);
+  });
+});
+
+describe("inspectMessage", () => {
+  it("lista as afirmativas faltantes e os campos não reconhecidos, sem expor valores", () => {
+    const fields = fullForm((item) => ({ title: ITEM_TEXTS[item - 1], value: 4 })).filter(
+      (field) => !field.title?.startsWith("Meu chefe me incentiva")
+    );
+    const report = inspectMessage({
+      id: 7,
+      channel: { id: 99 },
+      dataFields: [{ name: "nome", title: "Nome", type: "text", value: "Fulano" }, { name: "setor", value: "AVA" }, ...fields],
+    });
+    expect(report.channelId).toBe("99");
+    expect(report.itemsRecognized).toBe(34);
+    expect(report.missingItems).toEqual([23]);
+    expect(report.unrecognizedFields.map((f) => f.name)).toEqual(["nome", "setor"]);
+    expect(report.unrecognizedFields[0].valueKind).toBe("string");
+    expect(JSON.stringify(report)).not.toContain("Fulano");
+    expect(report.mapping).toMatchObject({ ok: true, setor: "AVA" });
+  });
+
+  it("explica por que um payload qualquer não seria aceito", () => {
+    const report = inspectMessage({ id: 8, dataFields: [{ name: "descreva", title: "Descreva", value: "x" }] });
+    expect(report.itemsRecognized).toBe(0);
+    expect(report.missingItems).toHaveLength(ITEM_COUNT);
+    expect(report.mapping.ok).toBe(false);
   });
 });
 
