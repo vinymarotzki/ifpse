@@ -27,7 +27,7 @@ describe("analyze", () => {
     expect(result.factors.every((f) => f.level === null && f.riskIndex === null)).toBe(true);
   });
 
-  describe("HSE 35", () => {
+  describe("completo (35)", () => {
     it("todo mundo respondeu 5: negativos em Alto, positivos em Baixo", () => {
       const f = byId([row(1, 5), row(2, 5)]);
       expect(f.demandas.level).toBe("alto");
@@ -96,7 +96,7 @@ describe("analyze", () => {
     expect(result.factors.find((f) => f.id === "controle")!.answerCount).toBe(6 + 2);
   });
 
-  it("questionário desconhecido cai no HSE 35 sem lançar", () => {
+  it("questionário desconhecido cai no questionário de 35 sem lançar", () => {
     const legacy = { ...row(1, 3), questionnaire: "outro" };
     expect(() => analyze([legacy])).not.toThrow();
     expect(analyze([legacy]).totals.forms).toEqual([expect.objectContaining({ id: "hse35", respondents: 1 })]);

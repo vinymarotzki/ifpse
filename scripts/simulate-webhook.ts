@@ -82,7 +82,7 @@ function buildEvent(index: number) {
   const generatedAt = isoDaysAgo(Math.floor(random() * days));
   const dataFields: Record<string, unknown>[] = [];
 
-  // O HSE de 35 original pede cabeçalho; o formulário real do canal 38274 não.
+  // O questionário de 35 original pede cabeçalho; o formulário real do canal 38274 não.
   if (form === "hse35") {
     dataFields.push(
       { name: "nome", title: "Nome", type: "text", value: `Servidor Sintético ${index}` },

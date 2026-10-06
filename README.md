@@ -1,7 +1,6 @@
-# HSE IT — Dashboard de Riscos Psicossociais
+# IFPSE — Dashboard de Riscos Psicossociais
 
-Painel responsivo (claro/escuro) que mostra os resultados do questionário **HSE IT** (Management
-Standards Indicator Tool) da CGC: perfil de risco por fator, respostas favoráveis × críticas,
+Painel responsivo (claro/escuro) que mostra os resultados do questionário do IFPSE, baseado no Management Standards Indicator Tool, da CGC: perfil de risco por fator, respostas favoráveis × críticas,
 evolução no tempo, mapa de calor setor × fator, afirmativas mais críticas e plano de ação.
 
 As respostas chegam **somente** por um webhook, conectado à API da SASI.
@@ -15,7 +14,7 @@ POST https://<host>/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>
 Também aceita o segredo no header `x-webhook-secret`. Evento esperado: `io.sasi.message` com a
 mensagem (e seus `dataFields`) em `data`. Variáveis em [.env.example](.env.example).
 
-Em produção (Vercel): `https://hse-it.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`.
+Em produção (Vercel): `https://ifpse.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`.
 
 ## Webhook de teste (primeiro payload)
 
@@ -36,7 +35,7 @@ as últimas capturas, em JSON legível no navegador. Sem `HSE_TEST_WEBHOOK_SECRE
 
 ```bash
 docker compose --profile prod up --build -d     # http://localhost:3002
-docker run --rm hseit-check npx tsx scripts/simulate-webhook.ts \
+docker run --rm ifpse-check npx tsx scripts/simulate-webhook.ts \
   --url http://host.docker.internal:3002 --secret segredo-local-de-teste
 docker compose --profile check run --rm check   # typecheck + lint + testes
 ```
