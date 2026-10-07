@@ -226,7 +226,7 @@ const HSE35 = build(
  * ("…dificultando…") e 4 ("conflitos…") são negativas; as demais estão redigidas
  * no sentido positivo.
  */
-const ESCOLA15_TEXTS = [
+export const ESCOLA15_TEXTS = [
   "Na escola, a quantidade de atividades relacionadas à prevenção e à segurança é compatível com o tempo e as pessoas disponíveis para realizá-las?",
   "As atividades de segurança da escola exigem lidar com muitas informações, tarefas ou situações ao mesmo tempo, dificultando a realização adequada das ações preventivas?",
   "Quando surge uma situação inesperada que pode afetar a segurança da escola, existem condições para lidar com o problema sem prejudicar outras ações importantes de prevenção?",

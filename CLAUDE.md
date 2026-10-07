@@ -45,11 +45,19 @@ Para regenerar o lockfile sem executar binários: `npm install --package-lock-on
   `profile`/`profileFields` carregam dados pessoais e são mascarados no log.
 - **Dois questionários** (`questionnaire.ts`): `escola15` (o do canal: 15 afirmativas de segurança
   escolar/CIPA Escolar) e `hse35` (questionário original de 35 afirmativas dos PDFs). Mesmos 7 fatores. O agrupamento do
-  `escola15` (3-2-2-2-2-2-2, na ordem) e o sentido de cada afirmativa (só a 2 e a 4 são negativas)
-  foram **inferidos do conteúdo — confirmar com a CGC**.
+  `escola15` (3-2-2-2-2-2-2, na ordem) e o sentido de cada afirmativa (só a 2 e a 4 são negativas,
+  críticas em 4–5; as outras 13 são críticas em 1–2) **foram confirmados pela planilha de regras
+  do SASI** (colunas Fator e Polaridade). A coluna "Tipo de item" dessa planilha marca também a 1 e
+  a 3 como "Negativo", mas isso é só a origem no HSE original; vale a Polaridade. Metodologia da
+  planilha: é triagem, não diagnóstico; resposta crítica isolada não classifica risco alto (a CIPA
+  valida recorrência, outros respondentes e relação com a segurança).
 - **Mapper** (`src/lib/hse/mapper.ts`): acha a afirmativa pelo texto no `title`/`name`, depois
   pelo slug do `name`, e (só `hse35`) por `pergunta_N`/"N." no título. O questionário da mensagem é
-  o que mais casar. Resposta aceita 1–5, rótulo, ou `"2_raramente"`. Não armazena o nome. Se o
+  o que mais casar. Resposta aceita 1–5, rótulo, ou `"2_raramente"`. Escala do SASI: 1 Nunca,
+  2 Raramente, 3 Às vezes, 4 Frequentemente, 5 Sempre; **N/A "Não tenho elementos para avaliar" não
+  entra no cálculo** (`fieldToScore` devolve `null`, a afirmativa é descartada; o `value` real do
+  N/A ainda não foi visto, o guard casa pelo texto). Respostas válidas abaixo de `HSE_MIN_ANSWERS`
+  (10) descartam a mensagem, então muitos N/A podem descartá-la. Não armazena o nome. Se o
   formato mudar, o payload cru está em `hse_webhook_log`/`hse_test_captures`.
 - **Armazenamento** (`src/lib/db.ts`, `store.ts`): libSQL; sem `TURSO_DATABASE_URL` usa
   `file:./data/ifpse.db` (volume no Docker). Upsert por `message_id`. Respostas em `answers_json`.
@@ -103,7 +111,7 @@ avisar que está pronto é permitido; aprovar e mergear é dele.
 
 - **Sem autenticação** na dashboard (os dados são agregados/anônimos, mas é saúde ocupacional).
   Os apps irmãos usam `?sasi-token=` validado em `AUTH_USER_ENDPOINT` — portar quando decidido.
-- Confirmar com a CGC: agrupamento em fatores e sentido das afirmativas do `escola15`; se "setor"
-  deve ser o time da SASI (hoje só "Time de Teste"); corte Alto ≥ 3,5.
+- Confirmar com a CGC: se "setor" deve ser o time da SASI (hoje só "Time de Teste"); corte
+  Alto ≥ 3,5. Conferir no próximo envio via SASI o `value` real do N/A.
 - Dados reais do canal só chegaram ao webhook de TESTE; o webhook principal ainda não foi
   cadastrado na SASI.

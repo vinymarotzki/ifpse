@@ -103,8 +103,14 @@ function candidateToScore(candidate: unknown): Score | null {
   return digit ? (Number(digit[1]) as Score) : null;
 }
 
+/** Opção N/A do SASI ("Não tenho elementos para avaliar"): fica fora do cálculo da exposição. */
+const NOT_APPLICABLE = "nao tenho elementos";
+
 export function fieldToScore(field: SasiDataField): Score | null {
-  for (const candidate of candidates(field)) {
+  const all = candidates(field);
+  // Antes do dígito: um value como "5_nao_tenho_elementos" não pode virar nota 5.
+  if (all.some((c) => typeof c === "string" && normalize(c).includes(NOT_APPLICABLE))) return null;
+  for (const candidate of all) {
     const score = candidateToScore(candidate);
     if (score) return score;
   }
