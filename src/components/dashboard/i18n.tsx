@@ -26,7 +26,6 @@ interface FactorText {
 interface Dict {
   htmlTitle: string;
   title: string;
-  subtitle: string;
   updated: string;
   noDataYet: string;
   refresh: string;
@@ -38,6 +37,9 @@ interface Dict {
   allSectors: string;
   period: string;
   presets: { all: string; d30: string; d90: string; year: string };
+  customPeriod: string;
+  /** "05/15/2026 to 10/07/2026": palavra entre as duas datas do resumo. */
+  rangeTo: string;
   from: string;
   to: string;
   loadError: string;
@@ -97,7 +99,6 @@ interface Dict {
 const pt: Dict = {
   htmlTitle: "IFPSE · Riscos Psicossociais",
   title: "Riscos Psicossociais",
-  subtitle: "IFPSE · baseado no Management Standards Indicator Tool · CGC",
   updated: "Atualizado:",
   noDataYet: "ainda sem dados",
   refresh: "Atualizar",
@@ -109,6 +110,8 @@ const pt: Dict = {
   allSectors: "Todos os setores",
   period: "Período",
   presets: { all: "Tudo", d30: "30 dias", d90: "90 dias", year: "Este ano" },
+  customPeriod: "Personalizado",
+  rangeTo: "a",
   from: "De",
   to: "Até",
   loadError: "Não foi possível carregar os dados. Tentando novamente…",
@@ -267,7 +270,6 @@ const pt: Dict = {
 const en: Dict = {
   htmlTitle: "IFPSE · Psychosocial Risks",
   title: "Psychosocial Risks",
-  subtitle: "IFPSE · based on the Management Standards Indicator Tool · CGC",
   updated: "Updated:",
   noDataYet: "no data yet",
   refresh: "Refresh",
@@ -279,6 +281,8 @@ const en: Dict = {
   allSectors: "All sectors",
   period: "Period",
   presets: { all: "All", d30: "30 days", d90: "90 days", year: "This year" },
+  customPeriod: "Custom",
+  rangeTo: "to",
   from: "From",
   to: "To",
   loadError: "Could not load the data. Retrying…",

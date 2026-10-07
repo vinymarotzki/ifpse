@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Gauge, HeartPulse, Inbox, Monitor, Moon, Percent, RefreshCw, Sun, TriangleAlert, Users, Webhook, type LucideIcon } from "lucide-react";
+import { Activity, Gauge, HeartPulse, Inbox, Info, Monitor, Moon, Percent, RefreshCw, Sun, TriangleAlert, Users, Webhook, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Analysis } from "@/lib/hse/analytics";
 import { FactorRadar, SimpleBars, Timeline } from "./charts";
@@ -116,6 +116,8 @@ export default function Dashboard() {
   const [setor, setSetor] = useState("");
   const [preset, setPreset] = useState<Preset | "custom">("all");
   const [range, setRange] = useState({ from: "", to: "" });
+  // Os campos De/Até só aparecem quando alguém pede "Personalizado".
+  const [showCustom, setShowCustom] = useState(false);
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -168,8 +170,18 @@ export default function Dashboard() {
   const hasTimeline = (analysis?.timeline.points.length ?? 0) >= 3;
 
   function applyPreset(next: Preset) {
+    setShowCustom(false);
     setPreset(next);
     setRange(presetRange(next));
+  }
+
+  function toggleCustom() {
+    if (showCustom) {
+      applyPreset("all");
+      return;
+    }
+    setShowCustom(true);
+    setPreset("custom");
   }
 
   return (
@@ -182,7 +194,6 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-xl font-semibold leading-tight text-ink sm:text-2xl">{t.title}</h1>
-            <p className="text-[13px] text-muted">{t.subtitle}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-[13px] text-muted">
@@ -218,8 +229,12 @@ export default function Dashboard() {
                 {t.presets[p.key]}
               </button>
             ))}
+            <button type="button" className="chip" aria-pressed={showCustom} onClick={toggleCustom}>
+              {t.customPeriod}
+            </button>
           </div>
         </div>
+        {showCustom && (
         <div className="flex items-end gap-2 text-[12px] font-medium text-muted">
           <label className="flex flex-col gap-1">
             {t.from}
@@ -246,6 +261,7 @@ export default function Dashboard() {
             />
           </label>
         </div>
+        )}
       </div>
 
       {error && (
@@ -272,7 +288,7 @@ export default function Dashboard() {
               hint={
                 analysis.totals.forms.length > 1
                   ? analysis.totals.forms.map((f) => `${fmtInt(f.respondents)} ${f.id === "escola15" ? t.formSchool : t.formFull}`).join(" · ")
-                  : `${fmtDate(analysis.totals.firstDate)} a ${fmtDate(analysis.totals.lastDate)}`
+                  : `${fmtDate(analysis.totals.firstDate)} ${t.rangeTo} ${fmtDate(analysis.totals.lastDate)}`
               }
             >
               {fmtInt(analysis.totals.respondents)}
@@ -308,7 +324,12 @@ export default function Dashboard() {
             {analysis.factors.map((factor) => (
               <article key={factor.id} className="card p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-ink">{t.factors[factor.id].name}</h3>
+                  <div className="flex min-w-0 items-start gap-1">
+                    <h3 className="font-semibold text-ink">{t.factors[factor.id].name}</h3>
+                    <span title={t.factors[factor.id].description} className="mt-1 cursor-help text-muted">
+                      <Info size={13} aria-label={t.factors[factor.id].description} role="img" />
+                    </span>
+                  </div>
                   <RiskBadge level={factor.level} />
                 </div>
                 <p className="mt-2 text-3xl font-semibold text-ink">
@@ -318,7 +339,6 @@ export default function Dashboard() {
                 <p className="mt-1 text-[13px] text-ink-2">
                   {t.criticalShare(fmt(factor.criticalPct), fmtInt(factor.criticalCount), fmtInt(factor.answerCount))}
                 </p>
-                <p className="mt-2 text-[12px] leading-snug text-muted">{t.factors[factor.id].description}</p>
               </article>
             ))}
           </div>
@@ -344,9 +364,12 @@ export default function Dashboard() {
             <ActionPlan factors={analysis.factors} />
           </Card>
 
-          <Card title={t.howToReadTitle}>
-            <Methodology />
-          </Card>
+          <details className="card group p-4 sm:p-5">
+            <summary className="card-title cursor-pointer select-none">{t.howToReadTitle}</summary>
+            <div className="mt-4">
+              <Methodology />
+            </div>
+          </details>
         </main>
       )}
 
