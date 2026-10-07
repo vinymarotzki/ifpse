@@ -1,95 +1,112 @@
-# IFPSE — Dashboard de Riscos Psicossociais
+# IFPSE
 
-Painel responsivo que mostra os resultados do questionário do IFPSE, baseado no Management
-Standards Indicator Tool, da CGC. É uma ferramenta de **triagem**, não de diagnóstico: uma
-resposta crítica isolada não classifica risco alto; a CIPA valida recorrência, outros respondentes
-e a relação com a segurança escolar.
+### Painel de riscos psicossociais para a segurança escolar
 
-**Produção:** https://ifpse.vercel.app
+O IFPSE transforma as respostas de um questionário curto em uma leitura clara de **como a
+organização da escola pode ajudar ou dificultar a prevenção de acidentes**: carga de atividades,
+relações entre as pessoas, participação, apoio da gestão, cooperação, clareza de papéis e
+comunicação das mudanças.
 
-## O que a página mostra
+Em vez de planilhas e relatórios longos, a CIPA, a coordenação e a gestão enxergam em uma única
+tela **onde está o risco, quanto ele pesa e o que fazer a respeito**.
 
-- Indicadores gerais: respondentes, índice geral de risco e quantos dos 7 fatores estão em risco Alto.
-- Perfil de risco (radar) e as afirmativas mais críticas.
-- Um cartão por fator (Demandas, Relacionamentos, Controle, Apoio da Chefia, Apoio dos Colegas,
-  Cargo, Comunicação e Mudanças), com índice, nível e proporção de respostas críticas.
-- Evolução no tempo (a partir de 3 pontos) e mapa de calor setor × fator (a partir de 2 setores).
-- Plano de ação com as medidas sugeridas para os fatores Moderado e Alto.
-- "Como ler esta dashboard": escala, classificação e respostas críticas (recolhido por padrão).
-- Filtros por setor e período (30 dias, 90 dias, este ano ou datas personalizadas).
+**[Acessar o painel](https://ifpse.vercel.app)**
 
-**Idioma e tema:** o cabeçalho tem os botões PT/EN e automático/claro/escuro. A escolha fica salva
-no navegador. A tradução vale só para a apresentação (textos, fatores, ações, metodologia, as 15
-afirmativas do questionário escolar, números e datas); servidor e banco continuam em português.
+![Painel do IFPSE em tema claro](docs/screenshots/painel-claro.png)
 
-## Como o risco é calculado
+<sub>Imagens com dados fictícios de demonstração.</sub>
 
-- Escala de resposta: Nunca = 1, Raramente = 2, Às vezes = 3, Frequentemente = 4, Sempre = 5.
-- **N/A ("Não tenho elementos para avaliar") não entra no cálculo.**
-- O sentido é da afirmativa: nas negativas vale a própria resposta; nas positivas a escala é
-  invertida. O resultado é a **nota de risco** (1–5, maior = pior).
-- A média das notas do fator é o **índice de risco**: Alto a partir de 3,5, Moderado a partir de
-  2,5, Baixo abaixo disso.
-- Resposta crítica = nota de risco 4 ou 5.
-- Questionário do canal (`escola15`, 15 afirmativas de segurança escolar/CIPA Escolar): as
-  afirmativas 2 e 4 são negativas (críticas em 4–5); as outras 13 são críticas em 1–2.
-- Mensagens com menos de 10 respostas válidas (`HSE_MIN_ANSWERS`) são descartadas.
+---
 
-## Webhook
+## Por que o IFPSE
 
-As respostas chegam **somente** por um webhook, conectado à API da SASI:
+| Em vez de... | O IFPSE entrega |
+| --- | --- |
+| Respostas soltas, difíceis de comparar | Um **índice de risco por fator**, de 1 a 5, com nível Alto, Moderado ou Baixo |
+| Descobrir o problema só depois do incidente | **Afirmativas mais críticas** em destaque, para saber por onde começar |
+| Médias que escondem diferenças | **Mapa de calor por setor**, mostrando onde cada fator pesa mais |
+| Um retrato de um único momento | **Evolução no tempo**, para ver se as ações estão funcionando |
+| Resultado sem encaminhamento | **Plano de ação** com medidas sugeridas para cada fator em atenção |
 
-```
-POST https://<host>/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>
-```
+## O que você vê
 
-Também aceita o segredo no header `x-webhook-secret`. Evento esperado: `io.sasi.message` com a
-mensagem (e seus `dataFields`) em `data`. Variáveis em [.env.example](.env.example).
+### Visão geral em segundos
 
-Em produção (Vercel): `https://ifpse.vercel.app/api/hse/webhook?secret=<HSE_WEBHOOK_SECRET>`.
+Três indicadores no topo (respondentes, índice geral de risco e quantos dos sete fatores estão em
+risco Alto), o **perfil de risco** em radar e a lista das afirmativas com mais respostas críticas.
+Abaixo, um cartão para cada fator, com índice, nível e a proporção de respostas críticas.
 
-### Webhook de teste
+### Evolução e comparação entre setores
 
-Para conferir o formato de um canal novo antes de gravar dados:
+![Evolução do índice de risco por fator](docs/screenshots/painel-evolucao.png)
 
-```
-POST https://<host>/api/hse/webhook-test?secret=<HSE_TEST_WEBHOOK_SECRET>
-GET  https://<host>/api/hse/webhook-test/captures?secret=<HSE_TEST_WEBHOOK_SECRET>
-```
+Acompanhe como cada fator se move ao longo dos meses e veja, linha a linha, quais setores
+concentram mais atenção.
 
-O primeiro só **captura** a chamada (mascarando credenciais, dados do remetente e o campo
-Nome) e devolve um diagnóstico do mapper: quantas afirmativas reconheceu, quais faltaram e
-quais campos não reconheceu. **Não grava respostas** e não alimenta a dashboard. O segundo lista
-as últimas capturas, em JSON legível no navegador. Sem `HSE_TEST_WEBHOOK_SECRET`, vale o
-`HSE_WEBHOOK_SECRET`.
+![Mapa de calor por setor e fator](docs/screenshots/painel-setores.png)
 
-## Rodando (Docker)
+### Do diagnóstico à ação
 
-Os binários nativos não rodam no host desta máquina, então tudo roda em container:
+Para cada fator em risco Moderado ou Alto, o painel apresenta o **plano de ação** com as medidas
+recomendadas, como revisão de processos, capacitação de lideranças, mediação de conflitos e gestão
+participativa. Fatores em risco Alto pedem um plano específico.
 
-```bash
-docker compose --profile check run --rm check   # typecheck + lint + testes
-docker compose --profile prod up --build -d     # http://localhost:3002
-docker compose --profile dev up --build         # com hot-reload
-docker run --rm ifpse-check npx tsx scripts/simulate-webhook.ts \
-  --url http://host.docker.internal:3002 --secret segredo-local-de-teste --count 150
-docker compose --profile prod down -v           # derruba e apaga o banco de teste
-```
+## Os sete fatores
 
-Sem `TURSO_DATABASE_URL`, o app usa um arquivo local `./data/ifpse.db` (volume no Docker).
+| Fator | O que observa |
+| --- | --- |
+| **Demandas** | Volume de atividades, prazos, ritmo e pausas |
+| **Relacionamentos** | Conflitos, respeito e qualidade das relações |
+| **Controle** | Participação nas decisões e autonomia |
+| **Apoio da Chefia** | Suporte, orientação e encaminhamento pela gestão |
+| **Apoio dos Colegas** | Cooperação e apoio mútuo entre as pessoas |
+| **Cargo** | Clareza de responsabilidades e do que fazer diante de um risco |
+| **Comunicação e Mudanças** | Como novas orientações e procedimentos chegam às pessoas |
 
-## Deploy
+## Como o risco é lido
 
-Vercel, projeto `ifpse`, ligado ao repositório: push em `main` publica em produção. O banco é um
-Turso (`ifpse`) injetado pelo Vercel. Segredos e cuidados em [CLAUDE.md](CLAUDE.md).
+1. Cada resposta vai de **Nunca (1)** a **Sempre (5)**. Quem não tem elementos para avaliar pode
+   marcar N/A, e essa resposta **não entra no cálculo**.
+2. O IFPSE considera o **sentido de cada afirmativa**: onde "sempre" é bom, a escala é invertida,
+   de modo que uma nota maior sempre significa mais risco.
+3. A média das notas de um fator é o **índice de risco**: **Alto** a partir de 3,5, **Moderado** a
+   partir de 2,5 e **Baixo** abaixo disso.
+4. Respostas com nota de risco 4 ou 5 são consideradas **críticas**, e a proporção delas aparece em
+   cada fator.
 
-## Fluxo de trabalho
+## Uma ferramenta de triagem, com cuidado
 
-`main` e `develop` são as únicas branches de longa duração. Toda alteração sai de `develop` em uma
-branch `FIX/<o-que-faz>` e sobe por PR para `develop`; `develop` vai para `main` por PR próprio.
-**Só o dono do repositório aprova o que sobe para `main`.**
+O IFPSE **aponta onde olhar; não rotula pessoas nem faz diagnóstico**. Ele não avalia saúde mental
+individual e não substitui avaliação psicológica, clínica ou social. Uma resposta crítica isolada
+não define risco alto: a CIPA valida se a situação é recorrente, se aparece em outras pessoas e se
+tem relação com a segurança escolar. O foco é sempre a **condição a ser melhorada** (comunicação,
+papéis, demandas, apoio), nunca a pessoa ou o grupo.
 
-## Mais detalhes
+- **Dados agregados e anônimos:** o painel mostra apenas resultados reunidos, e o nome de quem
+  respondeu não é armazenado.
+- **Risco nunca é só cor:** todo nível aparece com ícone e rótulo, para leitura clara também por
+  quem tem daltonismo.
 
-Arquitetura, regras de classificação, formato real do canal e pendências conhecidas em
-[CLAUDE.md](CLAUDE.md).
+## Feito para o dia a dia
+
+- **Atualização automática:** novas respostas aparecem no painel sem precisar recarregar.
+- **Filtros** por setor e por período (30 dias, 90 dias, este ano ou datas personalizadas).
+- **Em português e em inglês**, com troca em um clique.
+- **Tema claro, escuro ou automático**, que acompanha o dispositivo.
+- **Responsivo:** funciona no computador, no tablet e no celular.
+
+![Painel do IFPSE em tema escuro](docs/screenshots/painel-escuro.png)
+
+![Painel do IFPSE em inglês](docs/screenshots/painel-en.png)
+
+## Base metodológica
+
+O IFPSE se baseia no **Management Standards Indicator Tool**, referência internacional para
+avaliar os fatores de organização do trabalho que mais afetam o bem-estar, adaptado pela CGC ao
+contexto da **CIPA Escolar** e da segurança escolar. O questionário aplicado tem 15 afirmativas
+distribuídas nos sete fatores. Os resultados conversam com as inspeções, o mapa de riscos e as
+ações já desenvolvidas pela escola.
+
+---
+
+<sub>Informações técnicas para quem mantém o sistema: [CLAUDE.md](CLAUDE.md).</sub>
