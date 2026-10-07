@@ -41,6 +41,11 @@ describe("fieldToScore", () => {
     expect(fieldToScore({})).toBeNull();
   });
 
+  it("ignora N/A ('Não tenho elementos para avaliar'), mesmo com dígito no value", () => {
+    expect(fieldToScore({ formattedValue: "Não tenho elementos para avaliar" })).toBeNull();
+    expect(fieldToScore({ value: "5_nao_tenho_elementos", formattedValue: "Sempre" })).toBeNull();
+  });
+
   it("prefere o rótulo ao value quando divergem (value = id de opção)", () => {
     expect(fieldToScore({ value: 98123, formattedValue: "Frequentemente" })).toBe(4);
   });
