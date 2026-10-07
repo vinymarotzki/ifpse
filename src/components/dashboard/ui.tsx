@@ -1,6 +1,7 @@
 import { ShieldAlert, ShieldCheck, TriangleAlert, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { RISK_LABEL, type RiskLevel } from "@/lib/hse/risk";
+import type { RiskLevel } from "@/lib/hse/risk";
+import { useI18n } from "./i18n";
 
 const ICONS: Record<RiskLevel, LucideIcon> = {
   alto: ShieldAlert,
@@ -10,12 +11,13 @@ const ICONS: Record<RiskLevel, LucideIcon> = {
 
 /** Risco nunca é só cor: ícone + rótulo acompanham sempre. */
 export function RiskBadge({ level }: { level: RiskLevel | null }) {
-  if (!level) return <span className="badge bg-surface-2 text-muted">Sem dados</span>;
+  const { t } = useI18n();
+  if (!level) return <span className="badge bg-surface-2 text-muted">{t.noData}</span>;
   const Icon = ICONS[level];
   return (
     <span className={`badge badge-${level}`}>
       <Icon size={13} aria-hidden />
-      {RISK_LABEL[level]}
+      {t.riskLabel[level]}
     </span>
   );
 }

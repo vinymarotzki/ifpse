@@ -35,8 +35,14 @@
   --s7: #4a3aa7;
 }
 
+/*
+ * Escuro: automático pelo SO, a menos que o usuário tenha escolhido o claro
+ * (data-theme="light"); ou forçado por data-theme="dark". As duas listas abaixo
+ * precisam ficar idênticas — CSS não deixa compartilhar um bloco entre uma
+ * media query e um seletor de atributo.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --page: #0d0d0d;
     --surface: #1a1a19;
@@ -58,6 +64,29 @@
     --s6: #008300;
     --s7: #9085e9;
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #a09e97;
+  --line: #2c2c2a;
+  --axis: #383835;
+  --brand: #3987e5;
+  --ring: rgb(255 255 255 / 0.1);
+  --neutral-bar: #4a4a46;
+
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --s5: #d55181;
+  --s6: #008300;
+  --s7: #9085e9;
 }
 
 html {
