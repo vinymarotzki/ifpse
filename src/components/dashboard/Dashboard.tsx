@@ -1,9 +1,9 @@
 "use client";
 
-import { Activity, Building2, Gauge, HeartPulse, Inbox, Percent, RefreshCw, TriangleAlert, Users, Webhook } from "lucide-react";
+import { Activity, Gauge, HeartPulse, Inbox, Percent, RefreshCw, TriangleAlert, Users, Webhook } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Analysis } from "@/lib/hse/analytics";
-import { FactorBars, FactorRadar, ResponseMix, SimpleBars, Timeline } from "./charts";
+import { FactorRadar, SimpleBars, Timeline } from "./charts";
 import { fmt, fmtDate, fmtDateTime, fmtInt } from "./format";
 import { ActionPlan, Methodology, SectorHeatmap, TopItems } from "./panels";
 import { Card, RiskBadge } from "./ui";
@@ -127,9 +127,10 @@ export default function Dashboard() {
     () => (analysis?.sectors ?? []).slice(0, 8).map((s) => ({ name: s.setor, value: s.respondents })),
     [analysis]
   );
-  const ageBars = useMemo(() => (analysis?.ages ?? []).map((a) => ({ name: a.range, value: a.count })), [analysis]);
-  // O formulário escolar não pergunta a idade: sem nenhuma idade conhecida, o card some.
-  const hasAges = ageBars.some((bar) => bar.name !== "Não informada" && bar.value > 0);
+  // Com um único setor (hoje só o time de teste) o comparativo entre setores não diz nada.
+  const multiSector = (analysis?.totals.sectors ?? 0) > 1;
+  // Linha do tempo com 1–2 pontos é um gráfico quase vazio.
+  const hasTimeline = (analysis?.timeline.points.length ?? 0) >= 3;
 
   function applyPreset(next: Preset) {
     setPreset(next);
@@ -226,7 +227,7 @@ export default function Dashboard() {
       {analysis && hasData && (
         <main className="mt-5 space-y-5">
           {/* KPIs */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
             <Kpi
               icon={<Users size={20} aria-hidden />}
               label="Respondentes"
@@ -237,13 +238,6 @@ export default function Dashboard() {
               }
             >
               {fmtInt(analysis.totals.respondents)}
-            </Kpi>
-            <Kpi
-              icon={<Building2 size={20} aria-hidden />}
-              label="Setores"
-              hint={setor ? `Filtrado: ${setor}` : "Com ao menos uma resposta"}
-            >
-              {fmtInt(analysis.totals.sectors)}
             </Kpi>
             <Kpi
               icon={<Gauge size={20} aria-hidden />}
@@ -266,8 +260,8 @@ export default function Dashboard() {
             <Card className="lg:col-span-2" title="Perfil de risco" subtitle="Índice de risco por fator (1 a 5, maior = pior)">
               <FactorRadar factors={analysis.factors} />
             </Card>
-            <Card className="lg:col-span-3" title="Fatores por nível de risco" subtitle="Ordenados do mais para o menos crítico">
-              <FactorBars factors={analysis.factors} />
+            <Card className="lg:col-span-3" title="Afirmativas mais críticas" subtitle="Maior proporção de respostas críticas entre as afirmativas do questionário">
+              <TopItems items={analysis.items} />
             </Card>
           </div>
 
@@ -291,34 +285,22 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Card title="Respostas favoráveis × críticas" subtitle="Proporção de respostas por fator (críticas = nota de risco 4–5, considerando o sentido de cada afirmativa)">
-              <ResponseMix factors={analysis.factors} />
-            </Card>
+          {hasTimeline && (
             <Card title="Evolução no tempo" subtitle="Índice de risco por fator">
               <Timeline timeline={analysis.timeline} factors={analysis.factors} />
             </Card>
-          </div>
+          )}
 
-          <Card title="Setores × fatores" subtitle="Média e nível de risco de cada fator por setor — mais críticos primeiro">
-            <SectorHeatmap sectors={analysis.sectors} />
-          </Card>
-
-          <div className="grid gap-5 lg:grid-cols-3">
-            <Card className="lg:col-span-2" title="Afirmativas mais críticas" subtitle="Maior proporção de respostas críticas entre as afirmativas do questionário">
-              <TopItems items={analysis.items} />
-            </Card>
-            <div className="grid gap-5">
+          {multiSector && (
+            <>
+              <Card title="Setores × fatores" subtitle="Média e nível de risco de cada fator por setor — mais críticos primeiro">
+                <SectorHeatmap sectors={analysis.sectors} />
+              </Card>
               <Card title="Respondentes por setor">
                 <SimpleBars data={sectorBars} label="Respondentes por setor" />
               </Card>
-              {hasAges && (
-                <Card title="Faixa etária">
-                  <SimpleBars data={ageBars} color="var(--s3)" label="Respondentes por faixa etária" />
-                </Card>
-              )}
-            </div>
-          </div>
+            </>
+          )}
 
           <Card title="Plano de ação" subtitle="Fatores Altos exigem plano específico; Moderados, avaliação de medidas (metodologia CGC)">
             <ActionPlan factors={analysis.factors} />
